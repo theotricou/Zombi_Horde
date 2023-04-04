@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# by Theo Tricou
+
 import AuxiliarFunctions as af
 import argparse
 import os
