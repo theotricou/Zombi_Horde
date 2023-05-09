@@ -20,14 +20,14 @@ class SpeciesSampler():
 
         self.experiment_folder = experiment_folder
         self.computed_datasets = [True, True, True]  # T, G, S
-        preexisting_samples = [int(x.split("_")[1]) for x in os.listdir(experiment_folder) if "SAMPLE" in x]
+        # preexisting_samples = [int(x.split("_")[1]) for x in os.listdir(experiment_folder) if "SAMPLE" in x]
+        #
+        # if len(preexisting_samples) == 0:
+        #     last_number = 1
+        # else:
+        #     last_number = sorted(preexisting_samples)[-1] + 1
 
-        if len(preexisting_samples) == 0:
-            last_number = 1
-        else:
-            last_number = sorted(preexisting_samples)[-1] + 1
-
-        self.output_folder = os.path.join(experiment_folder, "SAMPLE_" + str(last_number))
+        self.output_folder = os.path.join(experiment_folder, "SAMPLE_1")
 
         if not os.path.isdir(self.output_folder):
             os.mkdir(self.output_folder)
@@ -253,10 +253,12 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    mode, input, pre_experiment_folder =  args.mode, args.input, args.output
-    def my_function(X):
-        experiment_folder = pre_experiment_folder+str(X[1])
-        ss = SpeciesSampler(experiment_folder, X[0])
+    if args.rep == 0:
+        mode, input, experiment_folder =  args.mode, args.input, args.output
+        SEED = args.seed
+        random.seed(SEED)
+        seeds = random.sample(range(10**8,10**9), 1)
+        ss = SpeciesSampler(experiment_folder, seeds[0])
         if mode == "i":
             ss.mode_i(input)
 
@@ -268,15 +270,31 @@ if __name__ == "__main__":
 
         elif mode == "w":
             ss.mode_w(input)
+    else:
+        mode, input, pre_experiment_folder =  args.mode, args.input, args.output
+        def my_function(X):
+            experiment_folder = pre_experiment_folder+str(X[1])
+            ss = SpeciesSampler(experiment_folder, X[0])
+            if mode == "i":
+                ss.mode_i(input)
 
-    SEED = args.seed
-    random.seed(SEED)
-    seeds = random.sample(range(10**8,10**9), args.rep)
-    threads = args.threads
+            elif mode == "r":
+                ss.mode_r(input)
 
-    if int(threads) > int(args.rep):
-        threads = args.rep
+            elif mode == "n":
+                ss.mode_n(int(input))
 
-    with Pool(8) as pool:
-        pool.map(my_function, [[seeds[x], x] for x in range(args.rep)])
-    pool.close()
+            elif mode == "w":
+                ss.mode_w(input)
+
+        SEED = args.seed
+        random.seed(SEED)
+        seeds = random.sample(range(10**8,10**9), args.rep)
+        threads = args.threads
+
+        if int(threads) > int(args.rep):
+            threads = args.rep
+
+        with Pool(threads) as pool:
+            pool.map(my_function, [[seeds[x], x] for x in range(args.rep)])
+        pool.close()
