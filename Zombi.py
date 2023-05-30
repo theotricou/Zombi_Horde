@@ -179,12 +179,12 @@ class Zombi():
 
         print("Writing Genomes")
 
-        if advanced_mode == "f":
-            gss.write_genomes(genomes_folder, intergenic_sequences=True)
-            gss.write_gene_family_lengths(genome_folder)
-
-        else:
-            gss.write_genomes(genomes_folder, intergenic_sequences=False)
+        # if advanced_mode == "f":
+        #     gss.write_genomes(genomes_folder, intergenic_sequences=True)
+        #     gss.write_gene_family_lengths(genome_folder)
+        #
+        # else:
+        #     gss.write_genomes(genomes_folder, intergenic_sequences=False)
 
         if advanced_mode == "i":
             print("Writing interactomes")
